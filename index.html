@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="description" content="Barbearia dos Cria — estilo, cuidado e corte na régua na Mangueira, Rio de Janeiro.">
+  <title>Barbearia dos Cria | Mangueira, Rio de Janeiro</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#inicio" class="logo" aria-label="Barbearia dos Cria, início">
+        BARBEARIA <span>DOS CRIA</span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle"
+        aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="menu" aria-label="Menu principal">
+        <a href="#sobre">Sobre</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#agendamento">Agendamento</a>
+        <a href="#contato">Localização</a>
+      </nav>
+
+      <a class="header-cta" href="#agendamento">Agendar <span>↗</span></a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" id="inicio">
+      <div class="hero__media">
+        <img
+          src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=2000&q=85"
+          alt="Barbeiro trabalhando no acabamento de um corte masculino"
+          fetchpriority="high">
+      </div>
+
+      <div class="hero__overlay"></div>
+
+      <div class="container hero__content">
+        <p class="eyebrow enter">Mangueira · Rio de Janeiro</p>
+        <h1 class="enter">Seu estilo.<br><span>Sua identidade.</span></h1>
+        <p class="hero__lead enter">
+          Corte na régua, atendimento de verdade e aquela resenha que faz parte da experiência.
+        </p>
+
+        <div class="hero__actions enter">
+          <a href="#agendamento" class="btn btn--gold">
+            AGENDAR MEU CORTE <span>↗</span>
+          </a>
+          <a href="#servicos" class="btn btn--ghost">VER SERVIÇOS</a>
+        </div>
+
+        <p class="hero__note">ESTILO • TÉCNICA • RESENHA</p>
+      </div>
+
+      <a href="#sobre" class="scroll-hint" aria-label="Conheça a barbearia">
+        <span></span>
+      </a>
+    </section>
+
+    <section class="section" id="sobre">
+      <div class="container about">
+        <div class="reveal">
+          <p class="eyebrow">A barbearia</p>
+          <h2>Mais que um corte.<br><span>Um estilo de vida.</span></h2>
+
+          <p class="section-copy">
+            Um espaço pensado para cuidar do visual, valorizar sua identidade
+            e sair com a confiança renovada. Do degradê alinhado ao corte
+            clássico, cada detalhe faz diferença.
+          </p>
+
+          <ul class="pillars">
+            <li>Precisão</li>
+            <li>Estilo</li>
+            <li>Atendimento</li>
+            <li>Resenha</li>
+          </ul>
+
+          <a class="text-link" href="#agendamento">
+            Bora marcar? <span>→</span>
+          </a>
+        </div>
+
+        <figure class="about__img reveal">
+          <img
+            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1100&q=85"
+            alt="Interior de barbearia com cadeiras e espelhos"
+            loading="lazy">
+          <figcaption>
+            <span>01 / EXPERIÊNCIA</span>
+            Um tempo pra você.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="servicos">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="eyebrow">Serviços</p>
+          <h2>Escolhe o teu estilo.</h2>
+          <p class="note">
+            Os preços abaixo são exemplos para a apresentação e precisam
+            ser confirmados com o responsável antes da publicação.
+          </p>
+        </div>
+
+        <div class="services">
+          <article class="service-card reveal">
+            <div class="service-card__number">01</div>
+            <h3>Corte clássico</h3>
+            <p>Um visual limpo, versátil e sempre na régua.</p>
+            <div class="service-card__bottom">
+              <span>Consulte duração</span>
+              <strong>R$ 40</strong>
+            </div>
+          </article>
+
+          <article class="service-card reveal">
+            <div class="service-card__number">02</div>
+            <h3>Degradê</h3>
+            <p>Transição suave, acabamento preciso e seu estilo.</p>
+            <div class="service-card__bottom">
+              <span>Consulte duração</span>
+              <strong>R$ 45</strong>
+            </div>
+          </article>
+
+          <article class="service-card reveal">
+            <div class="service-card__number">03</div>
+            <h3>Barba</h3>
+            <p>Contorno alinhado para completar o visual.</p>
+            <div class="service-card__bottom">
+              <span>Consulte duração</span>
+              <strong>R$ 30</strong>
+            </div>
+          </article>
+
+          <article class="service-card service-card--featured reveal">
+            <div class="service-card__number">04 / COMBO</div>
+            <h3>Corte + barba</h3>
+            <p>O combo pra sair renovado da cabeça ao queixo.</p>
+            <div class="service-card__bottom">
+              <span>Consulte duração</span>
+              <strong>R$ 65</strong>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="galeria">
+      <div class="container">
+        <div class="section__head section__head--row reveal">
+          <div>
+            <p class="eyebrow">Inspiração</p>
+            <h2>Trabalho de respeito.</h2>
+          </div>
+          <p class="gallery-intro">
+            Referências visuais de cortes e barbearia para a apresentação do conceito.
+          </p>
+        </div>
+
+        <div class="gallery">
+          <figure class="gallery__item gallery__item--large reveal">
+            <img
+              src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1200&q=85"
+              alt="Referência de corte masculino em barbearia"
+              loading="lazy">
+            <figcaption><span>01</span> Degradê</figcaption>
+          </figure>
+
+          <figure class="gallery__item reveal">
+            <img
+              src="https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?auto=format&fit=crop&w=900&q=85"
+              alt="Barbeiro realizando acabamento do cabelo"
+              loading="lazy">
+            <figcaption><span>02</span> Acabamento</figcaption>
+          </figure>
+
+          <figure class="gallery__item reveal">
+            <img
+              src="https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=900&q=85"
+              alt="Ferramentas e ambiente de barbearia"
+              loading="lazy">
+            <figcaption><span>03</span> Na régua</figcaption>
+          </figure>
+
+          <figure class="gallery__item gallery__item--wide reveal">
+            <img
+              src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=85"
+              alt="Ambiente de barbearia"
+              loading="lazy">
+            <figcaption><span>04</span> A resenha</figcaption>
+          </figure>
+        </div>
+
+        <p class="image-disclaimer">
+          Imagens ilustrativas de bancos de imagem. Não representam necessariamente
+          esta barbearia nem trabalhos realizados no Rio de Janeiro. Substitua
+          por fotos autorizadas do estabelecimento quando disponíveis.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="agendamento">
+      <div class="container booking">
+        <div class="booking__intro reveal">
+          <p class="eyebrow">Agendamento</p>
+          <h2>Seu próximo corte começa aqui.</h2>
+          <p>
+            Escolha o serviço e o horário pretendido. O formulário abrirá
+            uma mensagem no WhatsApp para você solicitar a reserva.
+          </p>
+
+          <div class="booking__aside">
+            <span class="booking__icon">✳</span>
+            <div>
+              <strong>Sem complicação.</strong>
+              <p>Você confere a mensagem antes de enviá-la.</p>
+            </div>
+          </div>
+        </div>
+
+        <form class="form reveal" id="bookingForm" novalidate>
+          <div class="form__top">
+            <span>FAÇA SUA SOLICITAÇÃO</span>
+            <span>01 — 05</span>
+          </div>
+
+          <div class="field">
+            <label for="nome">Seu nome</label>
+            <input id="nome" name="nome" type="text"
+              autocomplete="name" placeholder="Como podemos te chamar?" required>
+            <p class="error" id="nome-erro" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="telefone">Seu telefone</label>
+            <input id="telefone" name="telefone" type="tel"
+              inputmode="tel" autocomplete="tel"
+              placeholder="(21) 90000-0000" required>
+            <p class="error" id="telefone-erro" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="servico">Serviço</label>
+            <select id="servico" name="servico" required>
+              <option value="">Selecione um serviço</option>
+              <option>Corte clássico</option>
+              <option>Degradê</option>
+              <option>Barba</option>
+              <option>Corte + barba</option>
+            </select>
+            <p class="error" id="servico-erro" role="alert"></p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="data">Data pretendida</label>
+              <input id="data" name="data" type="date" required>
+              <p class="error" id="data-erro" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="horario">Horário</label>
+              <input id="horario" name="horario" type="time" required>
+              <p class="error" id="horario-erro" role="alert"></p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--gold btn--block" id="submitBtn">
+            CONTINUAR PELO WHATSAPP <span>↗</span>
+          </button>
+
+          <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
+          <p class="form__fineprint">
+            A solicitação só será confirmada depois que a barbearia responder.
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" id="contato">
+      <div class="container contact reveal">
+        <div class="contact__copy">
+          <p class="eyebrow">Chega junto</p>
+          <h2>Estamos na<br><span>Mangueira.</span></h2>
+
+          <address>
+            Rua Graciete Matarazzo, nº 18<br>
+            Mangueira, Rio de Janeiro — RJ
+          </address>
+
+          <p class="note">
+            Endereço usado como referência para o conceito. Confirme com o
+            responsável antes de publicar.
+          </p>
+
+          <a class="text-link" id="mapBtn" href="#" target="_blank"
+            rel="noopener noreferrer">
+            Abrir localização no mapa <span>↗</span>
+          </a>
+        </div>
+
+        <div class="contact__visual">
+          <img
+            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=85"
+            alt="Interior acolhedor de uma barbearia"
+            loading="lazy">
+          <div class="contact__badge">
+            <span>✳</span>
+            <strong>BARBEARIA<br>DOS CRIA</strong>
+            <small>RIO DE JANEIRO · RJ</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="#inicio" class="logo">BARBEARIA <span>DOS CRIA</span></a>
+      <p>Estilo, cuidado e resenha.</p>
+
+      <nav aria-label="Links do rodapé">
+        <a href="#sobre">Sobre</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#agendamento">Agendamento</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <p>Desenvolvido por Samuel Dias Noronha. </p>
+      <small>© <span id="year"></span> Barbearia dos Cria. Projeto demonstrativo.</small>
+    </div>
+  </footer>
+</body>
+</html>
