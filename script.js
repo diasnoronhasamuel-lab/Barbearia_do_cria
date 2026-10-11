@@ -1,35 +1,47 @@
 "use strict";
 
 /*
-  CONFIGURAÇÃO DO PROJETO
+  BARBEARIA DOS CRIA
+  Front-end: HTML, CSS e JavaScript
+  Back-end: Node.js
+  Banco de dados: SQLite
 
-  1. Preencha whatsapp com o número oficial autorizado.
-  2. Use o formato: 5521999999999
-  3. Não use +, espaços ou traços no número.
-  4. apiBaseUrl ficará null até criarmos o backend.
+  CONFIGURAÇÃO:
+  - whatsapp: número oficial com DDI e DDD, somente números.
+    Exemplo: 5521999999999
+  - apiBaseUrl: endereço da API local.
+    O servidor Node.js deve estar em execução.
 */
 
 const CONFIG = {
   address: "Rua Graciete Matarazzo, 18, Mangueira, Rio de Janeiro, RJ",
-  whatsapp: "", // Preencher com o número oficial
-  apiBaseUrl: null
+  whatsapp: "",
+  apiBaseUrl: /^(localhost|127\.|10\.|192\.168\.)/.test(window.location.hostname)
+    ? `http://${window.location.hostname}:3001/api`
+    : "/api"
 };
 
 const reducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
 
-/* ===== DATA LOCAL ===== */
+
+/* =============================================
+   1. DATA LOCAL
+============================================= */
 
 function localDateISO(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
+  return `${y}-${m}-${d}`;
 }
 
-/* ===== CABEÇALHO E MENU ===== */
+
+/* =============================================
+   2. CABEÇALHO E MENU
+============================================= */
 
 function initHeader() {
   const header = document.getElementById("header");
@@ -52,10 +64,8 @@ function initHeader() {
   };
 
   toggle.addEventListener("click", () => {
-    const isOpen =
-      toggle.getAttribute("aria-expanded") === "true";
-
-    setMenu(!isOpen);
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    setMenu(open);
   });
 
   menu.querySelectorAll("a").forEach((link) => {
@@ -74,34 +84,36 @@ function initHeader() {
     }
   });
 
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
+  window.addEventListener(
+    "scroll",
+    () => {
+      const y = window.scrollY;
+      const isOpen =
+        toggle.getAttribute("aria-expanded") === "true";
 
-    header.classList.toggle("is-scrolled", y > 30);
+      header.classList.toggle("is-scrolled", y > 30);
+      header.classList.toggle(
+        "is-hidden",
+        y > lastY && y > 420 && !isOpen
+      );
 
-    const isOpen =
-      toggle.getAttribute("aria-expanded") === "true";
-
-    header.classList.toggle(
-      "is-hidden",
-      y > lastY && y > 420 && !isOpen
-    );
-
-    lastY = y;
-  }, { passive: true });
+      lastY = y;
+    },
+    { passive: true }
+  );
 
   header.classList.toggle("is-scrolled", window.scrollY > 30);
 }
 
-/* ===== ANIMAÇÕES AO ROLAR A PÁGINA ===== */
+
+/* =============================================
+   3. ANIMAÇÕES AO ROLAR A PÁGINA
+============================================= */
 
 function initReveal() {
   const items = document.querySelectorAll(".reveal");
 
-  if (
-    reducedMotion ||
-    !("IntersectionObserver" in window)
-  ) {
+  if (reducedMotion || !("IntersectionObserver" in window)) {
     items.forEach((item) => {
       item.classList.add("is-visible");
     });
@@ -124,23 +136,108 @@ function initReveal() {
   items.forEach((item) => observer.observe(item));
 }
 
-/* ===== TRATAMENTO DE IMAGENS COM ERRO ===== */
+
+/* =============================================
+   4. FOTOS COM TENTATIVA DE OUTRAS EXTENSÕES
+============================================= */
+
+const EXTENSIONS = [
+  ".jpeg",
+  ".jpg",
+  ".png",
+  ".webp",
+  ".JPG",
+  ".JPEG",
+  ".PNG"
+];
 
 function initImageFallback() {
   document.querySelectorAll("img").forEach((img) => {
-    const hide = () => {
-      img.classList.add("is-missing");
+    const src = img.getAttribute("src") || "";
+    const match = src.match(/^(.*)(\.[a-z]+)$/i);
+
+    if (!match) return;
+
+    const base = match[1];
+    const tried = new Set([match[2]]);
+
+    const onError = () => {
+      const next = EXTENSIONS.find((ext) => !tried.has(ext));
+
+      if (next) {
+        tried.add(next);
+        img.src = base + next;
+      } else {
+        img.classList.add("is-missing");
+      }
     };
 
-    img.addEventListener("error", hide);
+    img.addEventListener("error", onError);
 
-    if (img.complete && img.naturalWidth === 0) {
-      hide();
+    if (
+      img.complete &&
+      img.naturalWidth === 0 &&
+      img.getAttribute("loading") !== "lazy"
+    ) {
+      onError();
     }
   });
 }
 
-/* ===== MAPA E RODAPÉ ===== */
+
+/* =============================================
+   5. GALERIA: FOTO AMPLIADA
+============================================= */
+
+function initLightbox() {
+  const box = document.getElementById("lightbox");
+  const boxImg = document.getElementById("lightboxImg");
+  const caption = document.getElementById("lightboxCaption");
+  const closeBtn = document.getElementById("lightboxClose");
+
+  if (
+    !box ||
+    !boxImg ||
+    !caption ||
+    !closeBtn ||
+    typeof box.showModal !== "function"
+  ) {
+    return;
+  }
+
+  document.querySelectorAll(".gallery__btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const img = btn.querySelector("img");
+      const text = btn.parentElement.querySelector("figcaption");
+
+      if (!img) return;
+
+      boxImg.src = img.currentSrc || img.src;
+      boxImg.alt = img.alt;
+
+      caption.textContent = text
+        ? text.textContent.trim()
+        : "";
+
+      box.showModal();
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    box.close();
+  });
+
+  box.addEventListener("click", (event) => {
+    if (event.target === box) {
+      box.close();
+    }
+  });
+}
+
+
+/* =============================================
+   6. MAPA E RODAPÉ
+============================================= */
 
 function initContact() {
   const mapBtn = document.getElementById("mapBtn");
@@ -158,7 +255,10 @@ function initContact() {
   }
 }
 
-/* ===== VALIDAÇÃO DO FORMULÁRIO ===== */
+
+/* =============================================
+   7. VALIDAÇÃO DO FORMULÁRIO
+============================================= */
 
 const validators = {
   nome: (value) => {
@@ -198,20 +298,19 @@ const validators = {
   }
 };
 
-/* Mostra ou remove a mensagem de erro */
 
 function showError(form, name, message) {
   const input = form.elements[name];
-  const field = input?.closest(".field");
 
-  if (!field || !input) return;
+  if (!input) return;
 
-  field.classList.toggle("has-error", Boolean(message));
+  const field = input.closest(".field");
 
-  input.setAttribute(
-    "aria-invalid",
-    String(Boolean(message))
-  );
+  if (field) {
+    field.classList.toggle("has-error", Boolean(message));
+  }
+
+  input.setAttribute("aria-invalid", String(Boolean(message)));
 
   const error = document.getElementById(`${name}-erro`);
 
@@ -220,13 +319,22 @@ function showError(form, name, message) {
   }
 }
 
-/* Verifica todos os campos */
 
 function validateForm(form) {
   let valid = true;
 
-  Object.entries(validators).forEach(([name, validator]) => {
-    const message = validator(form.elements[name].value);
+  Object.entries(validators).forEach(([name, validate]) => {
+    const input = form.elements[name];
+
+    if (!input) {
+      valid = false;
+      console.error(
+        `Campo "${name}" não encontrado no formulário.`
+      );
+      return;
+    }
+
+    const message = validate(input.value);
 
     showError(form, name, message);
 
@@ -238,13 +346,17 @@ function validateForm(form) {
   return valid;
 }
 
-/* ===== MENSAGEM DO WHATSAPP ===== */
 
-function formatDate(isoDate) {
-  const [year, month, day] = isoDate.split("-");
+/* =============================================
+   8. WHATSAPP
+============================================= */
+
+function formatDate(iso) {
+  const [year, month, day] = iso.split("-");
 
   return `${day}/${month}/${year}`;
 }
+
 
 function buildWhatsAppMessage(payload) {
   return [
@@ -260,84 +372,118 @@ function buildWhatsAppMessage(payload) {
   ].join("\n");
 }
 
-/* ===== PONTO DE INTEGRAÇÃO COM O BACKEND ===== */
 
-/*
-  Esta função ficará pronta para receber a API Node.js/Express.
-
-  Enquanto apiBaseUrl for null, o envio pelo formulário
-  utiliza o WhatsApp.
-
-  Quando o backend existir, precisaremos configurar a URL
-  e implementar a rota POST /bookings no servidor.
-*/
+/* =============================================
+   9. COMUNICAÇÃO COM O BACK-END
+============================================= */
 
 async function submitBooking(payload) {
   if (!CONFIG.apiBaseUrl) {
-    return { demo: true };
+    throw new Error("O endereço da API não foi configurado.");
   }
 
-  const response = await fetch(
-    `${CONFIG.apiBaseUrl}/bookings`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    }
-  );
+  let response;
+
+  try {
+    response = await fetch(
+      `${CONFIG.apiBaseUrl}/bookings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+  } catch (error) {
+    console.error("Falha na conexão com a API:", error);
+
+    throw new Error(
+      "Não foi possível conectar ao servidor. " +
+      "Confira se o terminal do Node.js continua aberto " +
+      "e se a API está funcionando na porta 3001."
+    );
+  }
+
+  let resultado;
+  const respostaTexto = await response.text();
+
+  try {
+    resultado = respostaTexto
+      ? JSON.parse(respostaTexto)
+      : {};
+  } catch {
+    console.error(
+      "A API retornou uma resposta que não é JSON:",
+      respostaTexto
+    );
+
+    throw new Error(
+      "O servidor respondeu em um formato inesperado."
+    );
+  }
 
   if (!response.ok) {
-    throw new Error("Falha ao enviar o agendamento.");
+    console.error("A API recusou o agendamento:", {
+      status: response.status,
+      resposta: resultado
+    });
+
+    throw new Error(
+      resultado.erro ||
+      `O servidor recusou a solicitação (HTTP ${response.status}).`
+    );
   }
 
-  return response.json();
+  return resultado;
 }
 
-/* ===== FORMULÁRIO ===== */
+
+/* =============================================
+   10. FORMULÁRIO DE AGENDAMENTO
+============================================= */
 
 function initForm() {
   const form = document.getElementById("bookingForm");
   const status = document.getElementById("formStatus");
   const submitBtn = document.getElementById("submitBtn");
 
-  if (!form || !status || !submitBtn) return;
+  if (!form || !status || !submitBtn) {
+    console.warn(
+      "Formulário não inicializado: confira bookingForm, " +
+      "formStatus e submitBtn no HTML."
+    );
+    return;
+  }
 
-  const dateInput = form.elements.data;
+  const defaultLabel = submitBtn.textContent;
 
-  // Usa a data local, evitando diferenças causadas pelo UTC.
-  dateInput.min = localDateISO();
+  const campoData = form.elements.data;
+
+  if (campoData) {
+    campoData.min = localDateISO();
+  }
 
   Object.keys(validators).forEach((name) => {
     const input = form.elements[name];
 
-    input.addEventListener("blur", () => {
-      showError(
-        form,
-        name,
-        validators[name](input.value)
-      );
-    });
+    if (!input) {
+      console.warn(`Campo "${name}" não encontrado no HTML.`);
+      return;
+    }
 
-    input.addEventListener("input", () => {
-      if (input.getAttribute("aria-invalid") === "true") {
-        showError(
-          form,
-          name,
-          validators[name](input.value)
-        );
-      }
-    });
+    const recheck = () => {
+      showError(form, name, validators[name](input.value));
+    };
 
-    input.addEventListener("change", () => {
-      if (input.getAttribute("aria-invalid") === "true") {
-        showError(
-          form,
-          name,
-          validators[name](input.value)
-        );
-      }
+    input.addEventListener("blur", recheck);
+
+    ["input", "change"].forEach((eventName) => {
+      input.addEventListener(eventName, () => {
+        if (input.getAttribute("aria-invalid") === "true") {
+          recheck();
+        }
+      });
     });
   });
 
@@ -358,30 +504,16 @@ function initForm() {
       new FormData(form).entries()
     );
 
-    // Verificação adicional da data.
-    if (payload.data < localDateISO()) {
-      showError(
-        form,
-        "data",
-        "Escolha uma data de hoje em diante."
-      );
-
-      status.textContent = "Revise a data escolhida.";
-
-      return;
-    }
-
     /*
-      SEM BACKEND:
-      abre o WhatsApp com a mensagem pronta.
+      MODO WHATSAPP:
+      Usado somente quando apiBaseUrl estiver como null.
     */
 
     if (!CONFIG.apiBaseUrl) {
       if (!CONFIG.whatsapp) {
         status.textContent =
-          "O formulário está pronto, mas falta configurar " +
-          "o número oficial do WhatsApp em CONFIG.whatsapp " +
-          "no arquivo script.js.";
+          "Falta configurar o número oficial do WhatsApp " +
+          "em CONFIG.whatsapp, no arquivo script.js.";
 
         return;
       }
@@ -400,42 +532,62 @@ function initForm() {
     }
 
     /*
-      COM BACKEND:
-      envia os dados à API.
+      MODO BACK-END:
+      Envia os dados para o Node.js, que os salva no SQLite.
     */
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "ENVIANDO...";
+    submitBtn.textContent = "Enviando...";
 
     try {
-      await submitBooking(payload);
+      const resultado = await submitBooking(payload);
+
+      console.log(
+        "Solicitação recebida pela API:",
+        resultado
+      );
 
       status.textContent =
+        resultado.mensagem ||
         "Solicitação enviada. Aguarde a confirmação da barbearia.";
 
       form.reset();
 
-      dateInput.min = localDateISO();
+      if (campoData) {
+        campoData.min = localDateISO();
+      }
+
+      // Limpa as mensagens de validação após o envio.
+      Object.keys(validators).forEach((name) => {
+        showError(form, name, "");
+      });
 
     } catch (error) {
+      console.error("Erro no agendamento:", error);
+
       status.textContent =
+        error.message ||
         "Não foi possível enviar agora. Tente novamente.";
 
     } finally {
       submitBtn.disabled = false;
-
-      submitBtn.innerHTML =
-        'CONTINUAR PELO WHATSAPP <span aria-hidden="true">↗</span>';
+      submitBtn.textContent = defaultLabel;
     }
   });
 }
 
-/* ===== INICIALIZAÇÃO ===== */
+
+/* =============================================
+   11. INICIALIZAÇÃO
+============================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   initHeader();
   initReveal();
   initImageFallback();
+  initLightbox();
   initContact();
   initForm();
+
+  console.log("Barbearia dos Cria: JavaScript inicializado.");
 });

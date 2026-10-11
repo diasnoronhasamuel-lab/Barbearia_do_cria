@@ -1,0 +1,12 @@
+{
+  "name": "barbearia-dos-cria",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --env-file=.env server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

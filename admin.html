@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel | Barbearia dos Cria</title>
+<style>
+  :root {
+    --black: #0b0b0b;
+    --black-2: #141414;
+    --gold: #c6a15b;
+    --gold-light: #e4ca91;
+    --white: #f5f2ec;
+    --gray: #aaa49a;
+    --line: rgba(198, 161, 91, .25);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--black); color: var(--white);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.5;
+  }
+  .wrap { width: min(1100px, 100% - 2rem); margin: 0 auto; padding: 2rem 0 4rem; }
+  h1 {
+    font-family: Impact, "Arial Narrow", sans-serif; font-weight: 400;
+    text-transform: uppercase; letter-spacing: .05em; font-size: clamp(1.8rem, 5vw, 2.8rem);
+    margin: 0 0 .3rem;
+  }
+  h1 span { color: var(--gold); }
+  .sub { color: var(--gray); margin: 0 0 1.5rem; font-size: .9rem; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: 1rem; }
+  .toolbar input {
+    flex: 1 1 240px; min-height: 46px; padding: .6rem .85rem; border: 1px solid #343434;
+    background: #171717; color: var(--white); font: inherit; border-radius: 0;
+  }
+  .toolbar input:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
+  button {
+    min-height: 46px; padding: .6rem 1.2rem; border: 1px solid var(--gold); background: var(--gold);
+    color: var(--black); font: 700 .75rem system-ui, sans-serif; letter-spacing: .1em;
+    text-transform: uppercase; cursor: pointer;
+  }
+  button:hover { background: var(--gold-light); }
+  button:disabled { opacity: .6; cursor: wait; }
+
+  .status { color: var(--gold-light); font-size: .88rem; min-height: 1.4em; margin-bottom: .75rem; }
+  .status.erro { color: #ff9d95; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: #0c0c0c; }
+  table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  th, td { padding: .85rem 1rem; text-align: left; border-bottom: 1px solid #242424; font-size: .92rem; }
+  th {
+    color: var(--gold); font-size: .7rem; letter-spacing: .13em; text-transform: uppercase;
+    background: var(--black-2); position: sticky; top: 0;
+  }
+  tbody tr:hover { background: rgba(198, 161, 91, .07); }
+  td.id { color: var(--gray); }
+  td a { color: var(--gold-light); text-decoration: none; border-bottom: 1px solid var(--gold); }
+  .vazio { padding: 2rem; text-align: center; color: var(--gray); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Painel da Barbearia dos <span> Crias da Mangueira</span></h1>
+  <p class="sub">Agendamentos recebidos pelo site. Mantenha o servidor (node server.js) em execução.</p>
+
+  <div class="toolbar">
+    <input id="busca" type="search" placeholder="Buscar por nome, telefone, serviço ou data" aria-label="Buscar agendamentos">
+    <button type="button" id="atualizar">Atualizar</button>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Serviço</th>
+          <th>Data</th>
+          <th>Horário</th>
+          <th>Recebido em</th>
+        </tr>
+      </thead>
+      <tbody id="lista"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// Na rede local usa a porta 3001; hospedado, usa o mesmo endereço do site
+const local = /^(localhost|127\.|10\.|192\.168\.)/.test(window.location.hostname);
+const API = local
+  ? `http://${window.location.hostname}:3001/api/bookings`
+  : "/api/bookings";
+
+const corpo = document.getElementById("lista");
+const status = document.getElementById("status");
+const busca = document.getElementById("busca");
+const botao = document.getElementById("atualizar");
+
+let agendamentos = [];
+
+// Evita que textos digitados no site quebrem a página
+function escapar(texto) {
+  const div = document.createElement("div");
+  div.textContent = String(texto ?? "");
+  return div.innerHTML;
+}
+
+// 2026-10-11 -> 11/10/2026
+function formatarData(iso) {
+  const partes = String(iso ?? "").split("-");
+  return partes.length === 3
+    ? `${partes[2]}/${partes[1]}/${partes[0]}`
+    : escapar(iso);
+}
+
+// O SQLite salva em UTC: converte para o horário local
+function formatarCriado(texto) {
+  const data = new Date(String(texto ?? "").replace(" ", "T") + "Z");
+
+  return isNaN(data)
+    ? escapar(texto)
+    : data.toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short"
+      });
+}
+
+function linkWhatsApp(telefone) {
+  const digitos = String(telefone ?? "").replace(/\D/g, "");
+
+  if (digitos.length < 10) return escapar(telefone);
+
+  return `<a href="https://wa.me/55${digitos}" target="_blank" rel="noopener noreferrer">${escapar(telefone)}</a>`;
+}
+
+function desenhar() {
+  const termo = busca.value.trim().toLowerCase();
+
+  const filtrados = agendamentos.filter((a) =>
+    [a.nome, a.telefone, a.servico, formatarData(a.data), a.horario]
+      .join(" ")
+      .toLowerCase()
+      .includes(termo)
+  );
+
+  if (filtrados.length === 0) {
+    corpo.innerHTML =
+      '<tr><td class="vazio" colspan="7">Nenhum agendamento encontrado.</td></tr>';
+  } else {
+    corpo.innerHTML = filtrados
+      .map(
+        (a) => `
+        <tr>
+          <td class="id">#${escapar(a.id)}</td>
+          <td>${escapar(a.nome)}</td>
+          <td>${linkWhatsApp(a.telefone)}</td>
+          <td>${escapar(a.servico)}</td>
+          <td>${formatarData(a.data)}</td>
+          <td>${escapar(a.horario)}</td>
+          <td>${formatarCriado(a.criado_em)}</td>
+        </tr>`
+      )
+      .join("");
+  }
+
+  status.className = "status";
+  status.textContent =
+    `${filtrados.length} de ${agendamentos.length} agendamento(s) exibido(s).`;
+}
+
+async function carregar() {
+  let senha = sessionStorage.getItem("senha");
+
+  if (!senha) {
+    senha = window.prompt("Senha do painel:");
+
+    if (!senha) {
+      status.className = "status erro";
+      status.textContent =
+        "Informe a senha e clique em Atualizar para ver os agendamentos.";
+      return;
+    }
+  }
+
+  botao.disabled = true;
+  status.className = "status";
+  status.textContent = "Carregando...";
+
+  try {
+    const resposta = await fetch(API, {
+      headers: { Authorization: `Bearer ${senha}` }
+    });
+
+    if (resposta.status === 401) {
+      sessionStorage.removeItem("senha");
+      throw new Error("Senha incorreta. Clique em Atualizar para tentar de novo.");
+    }
+
+    if (!resposta.ok) {
+      throw new Error(`Erro do servidor (HTTP ${resposta.status}).`);
+    }
+
+    const resultado = await resposta.json();
+    sessionStorage.setItem("senha", senha);
+    agendamentos = resultado.agendamentos || [];
+    desenhar();
+  } catch (erro) {
+    console.error("Erro ao carregar agendamentos:", erro);
+
+    status.className = "status erro";
+    status.textContent =
+      erro instanceof TypeError
+        ? "Não foi possível conectar ao servidor. Confira se ele está em execução."
+        : erro.message;
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+busca.addEventListener("input", desenhar);
+botao.addEventListener("click", carregar);
+
+carregar();
+</script>
+</body>
+</html>
